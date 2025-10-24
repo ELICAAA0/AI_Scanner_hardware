@@ -30,6 +30,10 @@ const hardwareInfo = {
   }
 };
 
+window.speechSynthesis.onvoiceschanged = () => {
+  window.availableVoices = speechSynthesis.getVoices();
+};
+
 // 🧠 Fungsi bantu ambil info berdasarkan nama
 function getHardwareInfo(label) {
   const lower = label.toLowerCase();
@@ -43,11 +47,18 @@ function getHardwareInfo(label) {
 
 // 🔊 Fungsi suara
 function speak(text) {
-  if (!text) return;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "id-ID";
-  window.speechSynthesis.cancel(); // biar gak numpuk
-  window.speechSynthesis.speak(utterance);
+  const synth = window.speechSynthesis;
+  synth.cancel(); // hentikan suara sebelumnya biar gak tumpuk
+
+  const utter = new SpeechSynthesisUtterance(text);
+  const voices = synth.getVoices();
+  const indoVoice = voices.find(v => v.lang.startsWith("id") || v.name.toLowerCase().includes("indonesia"));
+  if (indoVoice) utter.voice = indoVoice;
+
+  utter.lang = "id-ID";
+  utter.rate = 1;
+  utter.pitch = 1;
+  synth.speak(utter);
 }
 
 // 🚀 Inisialisasi model & kamera
@@ -58,9 +69,13 @@ async function init() {
   model = await tmImage.load(modelURL, metadataURL);
   maxPredictions = model.getTotalClasses();
 
+  // 🌐 Deteksi apakah perangkat HP → gunakan kamera belakang
   const flip = true;
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const facingMode = isMobile ? "environment" : "user"; // otomatis belakang di HP
+
   webcam = new tmImage.Webcam(250, 250, flip);
-  await webcam.setup();
+  await webcam.setup({ facingMode: facingMode }); // gunakan mode kamera yang sesuai
   await webcam.play();
 
   const webcamDiv = document.getElementById("webcam");
@@ -69,6 +84,7 @@ async function init() {
 
   labelContainer = document.getElementById("label-container");
   labelContainer.innerHTML = "";
+
   for (let i = 0; i < maxPredictions; i++) {
     labelContainer.appendChild(document.createElement("div"));
   }
@@ -76,6 +92,7 @@ async function init() {
   window.scanning = true;
   requestAnimationFrame(loop);
 }
+
 
 // 🔁 Loop kamera
 async function loop() {
@@ -102,17 +119,15 @@ async function predict() {
 
   const webcamCanvas = document.querySelector("#webcam canvas");
 
-  if (bestPrediction.probability > 0.95) {
+  if (bestPrediction.probability > 0.98) {
     const name = bestPrediction.className.trim();
     const info = getHardwareInfo(name);
 
-    // efek visual
     if (webcamCanvas) webcamCanvas.style.boxShadow = "0 0 20px lime";
     const status = document.getElementById("status");
     status.innerHTML = `✅ ${name} terdeteksi!`;
     status.style.color = "lime";
 
-    // suara
     if (!window.speaking || window.lastSpoken !== name) {
       speak(info ? info.sound : "Komponen ini belum terdaftar.");
       window.speaking = true;
@@ -120,7 +135,6 @@ async function predict() {
       setTimeout(() => (window.speaking = false), 4000);
     }
 
-    // snapshot hasil
     const snapshot = webcam.canvas.toDataURL("image/png");
     const img = new Image();
     img.src = snapshot;
@@ -129,7 +143,6 @@ async function predict() {
     img.style.objectFit = "cover";
     img.style.transition = "all 0.4s ease";
 
-    // stop kamera
     try {
       webcam.stop();
     } catch (err) {
@@ -140,7 +153,6 @@ async function predict() {
     webcamDiv.innerHTML = "";
     webcamDiv.appendChild(img);
 
-    // tampilkan info
     const infoBox = document.getElementById("infoBox");
     document.getElementById("popupTitle").innerText = name;
     document.getElementById("popupText").innerText = info ? info.text : "Belum ada info untuk komponen ini.";
@@ -183,7 +195,7 @@ document.getElementById("soundBtn").addEventListener("click", () => {
   }
 });
 
-// 🎯 Tombol Info Lengkap (FIX FINAL)
+// 🎯 Tombol Info Lengkap (dengan suara tambahan)
 const closeInfoBtn = document.getElementById("closeInfo");
 closeInfoBtn.addEventListener("click", () => {
   const infoBox = document.getElementById("infoBox");
@@ -191,7 +203,6 @@ closeInfoBtn.addEventListener("click", () => {
   const popupText = document.getElementById("popupText");
   const isExpanded = infoBox.classList.contains("expanded");
 
-  // Normalisasi nama supaya cocok ke key
   let titleKey = "";
   if (titleRaw.includes("cpu")) titleKey = "CPU";
   else if (titleRaw.includes("ram")) titleKey = "RAM";
@@ -199,7 +210,6 @@ closeInfoBtn.addEventListener("click", () => {
   else if (titleRaw.includes("power") || titleRaw.includes("psu")) titleKey = "PSU";
   else if (titleRaw.includes("mother") || titleRaw.includes("board")) titleKey = "Motherboard";
 
-  // Data info lengkap
   const hardwareInfo = {
     "CPU": {
       text: "CPU (Central Processing Unit) adalah otak komputer yang mengatur dan menjalankan semua instruksi dari program.",
@@ -215,7 +225,6 @@ closeInfoBtn.addEventListener("click", () => {
         💡 <b>Fakta Menarik:</b> Kecepatan CPU diukur dalam GHz (GigaHertz), yang menunjukkan berapa milyar operasi bisa dilakukan per detik.
       `
     },
-
     "RAM": {
       text: "RAM (Random Access Memory) adalah tempat penyimpanan sementara saat komputer sedang digunakan.",
       fullInfo: `
@@ -230,7 +239,6 @@ closeInfoBtn.addEventListener("click", () => {
         💡 <b>Fakta Menarik:</b> Semakin besar kapasitas RAM, semakin banyak program yang bisa dibuka bersamaan.
       `
     },
-
     "HDD": {
       text: "Hard Disk Drive (HDD) adalah media penyimpanan utama untuk menyimpan data dan sistem operasi.",
       fullInfo: `
@@ -245,7 +253,6 @@ closeInfoBtn.addEventListener("click", () => {
         💡 <b>Fakta Menarik:</b> HDD bekerja seperti piringan CD yang berputar, dan head-nya membaca data tanpa menyentuh langsung permukaan piringan!
       `
     },
-
     "PSU": {
       text: "Power Supply Unit (PSU) adalah alat yang mengubah listrik AC menjadi DC untuk komponen komputer.",
       fullInfo: `
@@ -260,7 +267,6 @@ closeInfoBtn.addEventListener("click", () => {
         💡 <b>Fakta Menarik:</b> PSU yang bagus punya sertifikasi 80 Plus, artinya lebih hemat listrik dan efisien.
       `
     },
-
     "Motherboard": {
       text: "Motherboard adalah papan utama tempat semua komponen komputer terhubung dan berkomunikasi.",
       fullInfo: `
@@ -277,13 +283,8 @@ closeInfoBtn.addEventListener("click", () => {
     }
   };
 
-  // 🔹 Ganti isi popup tergantung kondisi
   if (!isExpanded) {
-    if (hardwareInfo[titleKey]?.fullInfo) {
-      popupText.innerHTML = hardwareInfo[titleKey].fullInfo;
-    } else {
-      popupText.innerText = "ℹ Info lengkap belum tersedia untuk komponen ini.";
-    }
+    popupText.innerHTML = hardwareInfo[titleKey]?.fullInfo || "ℹ Info lengkap belum tersedia untuk komponen ini.";
     infoBox.classList.add("expanded");
     closeInfoBtn.innerText = "Tutup Info";
   } else {
@@ -291,12 +292,50 @@ closeInfoBtn.addEventListener("click", () => {
     infoBox.classList.remove("expanded");
     closeInfoBtn.innerText = "ℹ Info Lengkap";
   }
+
+  // 🎤 Tambahkan suara sesuai isi popup (persis teksnya)
+  speak(popupText.innerText || popupText.textContent);
 });
 
 // 📸 Tombol Capture
+// 📸 Tombol Capture — hasil tajam & fokus kamera + infoBox
 document.getElementById("captureBtn").addEventListener("click", () => {
-  const webcamArea = document.querySelector(".camera-container");
-  html2canvas(webcamArea)
+  const captureArea = document.querySelector(".camera-container");
+  const infoBox = document.getElementById("infoBox");
+
+  if (!captureArea || !infoBox) {
+    alert("❌ Elemen kamera atau infoBox tidak ditemukan!");
+    return;
+  }
+
+  // Simpan style asli
+  const originalStyle = {
+    opacity: infoBox.style.opacity,
+    backgroundColor: infoBox.style.backgroundColor,
+    backdropFilter: infoBox.style.backdropFilter,
+    color: infoBox.style.color,
+    boxShadow: infoBox.style.boxShadow,
+    transform: infoBox.style.transform,
+    filter: infoBox.style.filter,
+  };
+
+  // 🔍 Buat teks superjelas & kontras tinggi saat di-capture
+  infoBox.style.opacity = "1";
+  infoBox.style.backgroundColor = "#ffffff";
+  infoBox.style.backdropFilter = "none";
+  infoBox.style.color = "#000000";
+  infoBox.style.boxShadow = "none";
+  infoBox.style.filter = "contrast(120%) brightness(110%)";
+  infoBox.style.transform = "scale(1.02)"; // sedikit besar biar huruf halus
+
+  // 📸 Ambil tangkapan layar area kamera + infobox saja
+  html2canvas(captureArea, {
+    scale: 3, // resolusi lebih tinggi (3x)
+    backgroundColor: "#ffffff", // latar belakang putih bersih
+    useCORS: true,
+    allowTaint: true,
+    logging: false,
+  })
     .then((canvas) => {
       const link = document.createElement("a");
       link.download = "hasil-scan.png";
@@ -306,8 +345,31 @@ document.getElementById("captureBtn").addEventListener("click", () => {
     .catch((err) => {
       console.error("Gagal mengambil gambar:", err);
       alert("❌ Gagal mengambil gambar. Coba lagi ya!");
+    })
+    .finally(() => {
+      // 🔄 Kembalikan tampilan semula
+      Object.keys(originalStyle).forEach((key) => {
+        infoBox.style[key] = originalStyle[key];
+      });
     });
 });
 
+// 🌙 Toggle Mode Gelap / Terang
+document.addEventListener("DOMContentLoaded", () => {
+  const themeButton = document.getElementById("themeToggle");
+  if (themeButton) {
+    themeButton.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+      themeButton.textContent =
+        document.body.classList.contains("dark-mode")
+          ? "☀ Mode Terang"
+          : "🌙 Mode Gelap";
+
+      // Pastikan loop deteksi tetap jalan
+      if (window.scanning) requestAnimationFrame(loop);
+    });
+  }
+});
+
 // ⏯ Jalankan pertama kali
-init();
+init(); 
