@@ -188,3 +188,16 @@ button:hover {
     top: 10px;
   }
 }
+
+/* Pastikan kamera tidak menutupi tombol */
+#webcam canvas {
+  pointer-events: none !important;
+}
+
+/* Tombol dan info box harus bisa diklik di atas kamera */
+button, .info-container, .header-top {
+  position: relative;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
