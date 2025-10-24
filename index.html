@@ -12,6 +12,40 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      transition: background 0.5s, color 0.5s;
+    }
+
+    /* 🌙 Mode Gelap dengan efek glow */
+    body.dark-mode {
+      background: radial-gradient(circle at top, #0a0a0a, #1a1a1a 70%, #000);
+      color: #e0ffff;
+      text-shadow: 0 0 10px #00ffffaa;
+    }
+
+    body.dark-mode h1 {
+      color: #00ffff;
+      text-shadow: 0 0 15px #00ffffcc;
+    }
+
+    body.dark-mode .info-container {
+      background: #1a1a1a;
+      color: #e0ffff;
+      box-shadow: 0 0 20px #00ffff66;
+    }
+
+    body.dark-mode #webcam {
+      background: #111;
+      box-shadow: 0 0 25px #00ffff44;
+      border: 2px solid #00ffff55;
+    }
+
     /* 📸 Layout kamera dan info */
     .camera-container {
       display: flex;
@@ -19,7 +53,7 @@
       align-items: flex-start;
       gap: 20px;
       flex-wrap: wrap;
-      margin-top: 20px;
+      margin-top: 60px;
       position: relative;
       z-index: 1;
     }
@@ -31,7 +65,6 @@
       background: white;
       padding: 10px;
       position: relative;
-      z-index: 1;
     }
 
     /* 🧠 Info box */
@@ -53,48 +86,16 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    #popupTitle {
-      font-weight: bold;
-      color: #007BFF;
-      margin-bottom: 8px;
-    }
+    /* 📋 Info teks dan status */
+    #popupTitle { font-weight: bold; color: #007BFF; margin-bottom: 8px; }
+    #status { font-size: 22px; margin-top: 10px; font-weight: bold; color: lime; }
+    #info { margin-top: 10px; font-size: 18px; }
 
-    /* 🔧 Perbaikan transisi infoBox */
-    #infoBox {
-      transition: all 0.4s ease;
-      overflow: hidden;
-    }
-
-    #infoBox.expanded {
-      width: 360px !important;
-    }
-
-    /* 🎯 Pastikan elemen lain tetap responsif */
-    #label-container {
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    #status {
-      font-size: 22px;
-      margin-top: 10px;
-      font-weight: bold;
-      color: lime;
-      text-align: center;
-    }
-
-    #info {
-      margin-top: 10px;
-      font-size: 18px;
-      color: #333;
-      text-align: center;
-    }
-
+    /* 🎛️ Tombol utama */
     .button-container {
       margin-top: 20px;
       text-align: center;
     }
-
     button {
       margin: 5px;
       padding: 10px 16px;
@@ -104,20 +105,82 @@
       font-size: 16px;
       transition: 0.2s;
     }
-
     #startBtn { background: #007BFF; color: white; }
     #soundBtn { background: #ffc107; color: black; }
     #captureBtn { background: #28a745; color: white; }
 
-    button:hover {
-      opacity: 0.9;
-      transform: scale(1.03);
+    button:hover { opacity: 0.9; transform: scale(1.03); }
+
+    /* 🌟 Header pojok kanan */
+    .header-top {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .header-top button {
+      background: #0078d7;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+    }
+
+    .header-top button:hover {
+      background: #005fa3;
+      transform: scale(1.05);
+    }
+
+    body.dark-mode .header-top button {
+      background: #111;
+      color: #00ffff;
+      box-shadow: 0 0 15px #00ffffaa;
+      border: 1px solid #00ffff66;
+    }
+
+    body.dark-mode .header-top button:hover {
+      box-shadow: 0 0 25px #00ffffcc;
+      background: #0b0b0b;
+    }
+
+    /* 🌟 CREDIT SECTION */
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #222;
+      background: rgba(240, 240, 240, 0.9);
+      padding: 15px 10px;
+      border-top: 1px solid #ccc;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+      font-family: 'Poppins', sans-serif;
+      transition: background 0.4s, color 0.4s, box-shadow 0.4s;
+    }
+
+    body.dark-mode footer {
+      background: #111;
+      color: #00ffff;
+      box-shadow: 0 0 20px #00ffff44;
     }
   </style>
 </head>
 
 <body>
-  <h1 style="text-align:center;">🧠 AI Scanner Hardware Komputer</h1>
+  <!-- 🌟 Header tombol pojok kanan -->
+  <div class="header-top">
+    <button id="themeToggle">🌙 Mode Gelap</button>
+    <button id="aboutBtn">ℹ Tentang Proyek</button>
+  </div>
+
+  <h1>🧠 AI Scanner Hardware Komputer</h1>
 
   <div class="camera-container">
     <!-- 🎥 Kamera -->
@@ -127,10 +190,7 @@
     <div class="info-container" id="infoBox" style="display:none;">
       <h3 id="popupTitle"></h3>
       <p id="popupText"></p>
-      <button id="closeInfo"
-        style="background:#28a745; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">
-        ℹ Info Lengkap
-      </button>
+      <button id="closeInfo" style="background:#28a745;color:white;">ℹ Info Lengkap</button>
     </div>
   </div>
 
@@ -144,27 +204,26 @@
     <button id="captureBtn">📸 Capture</button>
   </div>
 
+  <!-- 🌟 CREDIT SECTION -->
+  <footer>
+    <p>🧠 <b>AI Scanner Hardware Komputer TKJ</b></p>
+    <p>Dikembangkan oleh <b>Elisa Anggun Septiyaningrum</b></p>
+    <p>Kelas: <b>XII TKJ 1</b> | SMKN 1 WONOSEGORO 💻</p>
+    <p>Powered by <i>Teachable Machine</i> & <i>TensorFlow.js</i></p>
+  </footer>
+
   <script src="script.js"></script>
 
-  <!-- 🌟 CREDIT SECTION -->
-<!-- 🌟 CREDIT SECTION -->
-<div id="credit">Made with ❤️ by <b>Elisa Anggun</b></div>
+  <script>
+    // 🌙 Tombol Mode Gelap
+    const themeToggle = document.getElementById("themeToggle");
+    let darkMode = false;
 
-<footer id="creditFooter">
-  <p>🧠 <b>AI Scanner Hardware Komputer TKJ</b></p>
-  <p>Dikembangkan oleh <b>Elisa Anggun Septiyaningrum</b></p>
-  <p>Kelas: <b>XII TKJ 1</b> | SMKN 1 WONOSEGORO 💻</p>
-  <p>Powered by <i>Teachable Machine</i> & <i>TensorFlow.js</i></p>
-  <button id="aboutBtn">ℹ Tentang Proyek</button>
-</footer>
-
-<!-- 🌙 Tombol Mode Gelap -->
-<button id="themeToggle">🌙 Mode Gelap</button>
-
-<script src="script.js"></script>
-</body>
-</html>
-
-</body>
+    themeToggle.addEventListener("click", () => {
+      darkMode = !darkMode;
+      document.body.classList.toggle("dark-mode", darkMode);
+      themeToggle.textContent = darkMode ? "☀ Mode Terang" : "🌙 Mode Gelap";
+    });
+  </script>
 </body>
 </html>
