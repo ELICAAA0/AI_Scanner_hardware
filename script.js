@@ -354,21 +354,57 @@ document.getElementById("captureBtn").addEventListener("click", () => {
     });
 });
 
-// 🌙 Toggle Mode Gelap / Terang
-document.addEventListener("DOMContentLoaded", () => {
-  const themeButton = document.getElementById("themeToggle");
-  if (themeButton) {
-    themeButton.addEventListener("click", () => {
-      document.body.classList.toggle("dark-mode");
-      themeButton.textContent =
-        document.body.classList.contains("dark-mode")
-          ? "☀ Mode Terang"
-          : "🌙 Mode Gelap";
+// 🌙 Mode Gelap / Terang
+const themeToggle = document.getElementById("themeToggle");
+let darkMode = false;
 
-      // Pastikan loop deteksi tetap jalan
-      if (window.scanning) requestAnimationFrame(loop);
-    });
+themeToggle.addEventListener("click", () => {
+  darkMode = !darkMode;
+
+  if (darkMode) {
+    document.body.classList.add("dark-mode");
+    themeToggle.textContent = "☀ Mode Terang";
+  } else {
+    document.body.classList.remove("dark-mode");
+    themeToggle.textContent = "🌙 Mode Gelap";
   }
+});
+
+// 🔍 Tentang Proyek
+document.getElementById("aboutBtn").addEventListener("click", () => {
+  const infoBox = document.getElementById("infoBox");
+  const popupTitle = document.getElementById("popupTitle");
+  const popupText = document.getElementById("popupText");
+  const closeInfoBtn = document.getElementById("closeInfo");
+
+  popupTitle.innerText = "Tentang Proyek AI Scanner 🧠";
+  popupText.innerHTML = `
+    <b>AI Scanner Hardware Komputer</b> adalah proyek pembelajaran interaktif
+    berbasis web yang menggunakan <b>Teachable Machine</b> untuk mengenali
+    komponen hardware seperti CPU, RAM, Harddisk, Power Supply, dan Motherboard.
+    <br><br>
+    Proyek ini dikembangkan oleh <b>Elisa Anggun Septiyaningrum</b> (XII TKJ 1, SMKN 1 Wonosegoro).
+    <br><br>
+    Dengan fitur:
+    <ul style="text-align:left;">
+      <li>📸 Deteksi real-time dengan kamera</li>
+      <li>🔊 Penjelasan otomatis menggunakan suara</li>
+      <li>💡 Mode Gelap Glowing</li>
+      <li>📷 Capture hasil deteksi</li>
+    </ul>
+    <br>
+    💻 Dibuat menggunakan <b>TensorFlow.js</b> dan <b>Teachable Machine</b>.
+  `;
+
+  infoBox.style.display = "block";
+  infoBox.classList.remove("expanded");
+  closeInfoBtn.innerText = "Tutup Info";
+});
+
+// 🔘 Tutup Info otomatis
+document.getElementById("closeInfo").addEventListener("click", () => {
+  const infoBox = document.getElementById("infoBox");
+  infoBox.style.display = "none";
 });
 
 // ⏯ Jalankan pertama kali
