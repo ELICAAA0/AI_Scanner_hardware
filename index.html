@@ -15,58 +15,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  
+ <!-- Font  -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"> 
+ </head>
 
-  <!-- CSS tambahan cepat di dalam file ini -->
-  <style>
-    /* 🌈 Gaya umum body halaman */
-    body {
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(to bottom, #1ec3f5, #f5f3f5);
-      color: #333;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-      transition: background 0.5s, color 0.5s;
-    }
-
-    /* 🌙 Mode gelap (class ini ditambah/dihapus lewat JS) */
-    body.dark-mode {
-      background: radial-gradient(circle at top, #0a0a0a, #1a1a1a 70%, #000);
-      color: #e0ffff;
-      text-shadow: 0 0 10px #00ffffaa;
-    }
-
-    /* 📸 Container kamera + info di samping */
-    .camera-container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-top: 60px;
-    }
-
-    /* Kotak tempat canvas webcam / snapshot */
-    #webcam {
-      width: 480px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      background: rgb(253, 253, 253);
-      padding: 10px;
-    }
-
-    /* Kotak info komponen di samping kamera */
-    .info-container {
-      width: 250px;
-      background: rgb(243, 244, 245);
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      text-align: left;
-      display: none; /* default disembunyikan, muncul kalau ada deteksi */
-    }
-  </style>
-</head>
 
 <body>
 
@@ -215,3 +168,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+
