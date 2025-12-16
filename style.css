@@ -1,4 +1,6 @@
-/* 🌈 Gaya umum */
+/* =====================================================
+   🌈 STYLE UTAMA WEBSITE
+   ===================================================== */
 body {
   font-family: "Poppins", sans-serif;
   text-align: center;
@@ -9,7 +11,9 @@ body {
   transition: background 0.4s, color 0.4s, box-shadow 0.4s;
 }
 
-/* 🌙 Mode Gelap Glowing */
+/* =====================================================
+   🌙 DARK MODE UTAMA (BACKGROUND + TEXT UMUM)
+   ===================================================== */
 body.dark-mode {
   background: radial-gradient(circle at top, #0a0a0a, #1c1c1c 60%, #000);
   color: #f0f0f0;
@@ -20,7 +24,9 @@ body.dark-mode * {
   transition: color 0.4s, background 0.4s, box-shadow 0.4s;
 }
 
-/* ✨ Efek Glow untuk Elemen Penting */
+/* =====================================================
+   ✨ EFEK GLOW PENTING SAAT DARK MODE
+   ===================================================== */
 body.dark-mode #webcam canvas {
   border-color: #00ffff;
   box-shadow: 0 0 25px #00ffff80;
@@ -37,7 +43,9 @@ body.dark-mode .info-box {
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
 }
 
-/* 🌟 Header pojok kanan atas */
+/* =====================================================
+   🔝 HEADER KANAN ATAS (BUTTON MODE & ABOUT)
+   ===================================================== */
 .header-top {
   position: fixed;
   top: 15px;
@@ -47,7 +55,7 @@ body.dark-mode .info-box {
   z-index: 100;
 }
 
-/* Tombol header */
+/* Tombol header umum */
 .header-top button {
   background-color: #0078d7;
   color: white;
@@ -66,7 +74,7 @@ body.dark-mode .info-box {
   transform: scale(1.05);
 }
 
-/* Tombol saat dark mode */
+/* 🔦 Tombol header saat DARK MODE */
 body.dark-mode .header-top button {
   background-color: #111;
   color: #00ffff;
@@ -80,7 +88,9 @@ body.dark-mode .header-top button:hover {
   transform: scale(1.1);
 }
 
-/* 🎥 Area kamera + info */
+/* =====================================================
+   🎥 AREA KAMERA + INFO SAMPING
+   ===================================================== */
 .scanner-container {
   display: flex;
   justify-content: center;
@@ -90,17 +100,19 @@ body.dark-mode .header-top button:hover {
   margin-top: 80px;
 }
 
+/* Kotak webcam */
 #webcam {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background-color: white;   /* Mode terang = putih */
   padding: 15px;
   border-radius: 15px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   position: relative;
 }
 
+/* Video/canvas bundar */
 #webcam video,
 #webcam canvas {
   border-radius: 50%;
@@ -108,11 +120,29 @@ body.dark-mode .header-top button:hover {
   width: 250px;
   height: 250px;
   object-fit: cover;
-  background: #000;
+
+  /* 🌞 Mode terang = background putih */
+  background: #ffffff;
   transition: all 0.3s ease;
 }
 
-/* 🧠 Kotak Info di samping */
+/* DARK MODE untuk kamera */
+body.dark-mode #webcam {
+  background: #0d0d0d !important;   /* Mode gelap = hitam */
+  border: 2px solid #00ffff66;
+  box-shadow: 0 0 15px #00ffff55;
+}
+
+/* 🌙 DARK MODE untuk video/canvas */
+body.dark-mode #webcam video,
+body.dark-mode #webcam canvas {
+  background: #0d0d0d !important;  /* Ikut gelap */
+}
+
+
+/* =====================================================
+   🧠 INFO BOX (KETERANGAN HARDWARE)
+   ===================================================== */
 .info-box {
   display: none;
   background-color: #ffffff;
@@ -126,7 +156,7 @@ body.dark-mode .header-top button:hover {
   z-index: 5;
 }
 
-/* ✨ Tombol dalam info box */
+/* Tombol info lengkap */
 #closeInfo {
   margin-top: 12px;
   padding: 8px 14px;
@@ -143,7 +173,16 @@ body.dark-mode .header-top button:hover {
   background-color: #27ae60;
 }
 
-/* Tombol utama */
+/* Mode gelap info box */
+body.dark-mode .info-container {
+  background: #0d0d0d;
+  color: #e0ffff;
+  box-shadow: 0 0 15px #00ffff55;
+}
+
+/* =====================================================
+   🔘 TOMBOL UTAMA (SCAN, CAPTURE, DLL)
+   ===================================================== */
 .button-container {
   display: flex;
   justify-content: center;
@@ -166,22 +205,28 @@ button:hover {
   background-color: #45a049;
 }
 
-/* 💫 Animasi */
+/* =====================================================
+   💫 ANIMASI UMUM
+   ===================================================== */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 📱 Responsif */
+/* =====================================================
+   📱 RESPONSIVE SMARTPHONE
+   ===================================================== */
 @media (max-width: 768px) {
   .scanner-container {
     flex-direction: column;
     align-items: center;
   }
+
   .info-box {
     width: 90%;
     margin-top: 20px;
   }
+
   .header-top {
     flex-direction: column;
     right: 10px;
@@ -189,15 +234,74 @@ button:hover {
   }
 }
 
-/* Pastikan kamera tidak menutupi tombol */
+/* =====================================================
+   ⛔ FIX: KAMERA TIDAK MENUTUPI TOMBOL
+   ===================================================== */
 #webcam canvas {
   pointer-events: none !important;
 }
 
-/* Tombol dan info box harus bisa diklik di atas kamera */
+/* Tombol tetap bisa diklik */
 button, .info-container, .header-top {
   position: relative;
   z-index: 1000;
   pointer-events: auto;
 }
+
+/* =====================================================
+   🪪 POPUP TENTANG PROYEK
+   ===================================================== */
+#aboutPopup {
+  background: white;
+  color: black;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  max-width: 350px;
+  margin: auto;
+  text-align: left;
+}
+
+/* Mode gelap popup */
+body.dark-mode #aboutPopup {
+  background: #0d0d0d !important;
+  color: #00ffff !important;
+  box-shadow: 0 0 20px #00ffff55;
+  border: 1px solid #00ffff88;
+}
+
+body.dark-mode #aboutPopup h2,
+body.dark-mode #aboutPopup p {
+  color: #00ffff !important;
+}
+
+body.dark-mode #closeAbout {
+  background: #00ffff !important;
+  color: #000 !important;
+}
+
+body.dark-mode {
+  background: #111;
+  color: white;
+}
+
+/* =======================================
+   FIX: FOTO UPLOAD AGAR PAS DI KOTAK KAMERA
+   ======================================= */
+#uploadedImageArea {
+  width: 250px !important;  /* samakan dengan ukuran webcam */
+  height: 250px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;  /* biar foto tidak keluar */
+  display: none;
+}
+
+#uploadedPreview {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;  /* biar pas & tidak gepeng */
+  border-radius: 50% !important;
+}
+
 
