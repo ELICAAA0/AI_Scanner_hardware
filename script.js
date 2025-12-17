@@ -242,12 +242,34 @@ const prediction = await model.predict(source);
 }
 
 
-    const snapshot = webcam.canvas.toDataURL("image/png");
-    const img = new Image();
-    img.src = snapshot;
-    img.style.width = "480px";
-    img.style.borderRadius = "10px";
+    // 🟢 Pastikan frame benar-benar tergambar
+await new Promise(resolve => requestAnimationFrame(resolve));
+
+const snapshot = webcam.canvas.toDataURL("image/png");
+
+const img = new Image();
+img.src = snapshot;
+
+// ⛔ JANGAN langsung stop sebelum gambar jadi
+img.onload = () => {
+    // Sembunyikan kamera
+    webcam.stop();
+    webcam.canvas.style.display = "none";
+
+    const webcamDiv = document.getElementById("webcam");
+
+    // hapus snapshot lama
+    const oldImg = document.getElementById("snapshotImage");
+    if (oldImg) oldImg.remove();
+
+    img.id = "snapshotImage";
+    img.style.width = "250px";
+    img.style.height = "250px";
+    img.style.borderRadius = "50%";
     img.style.objectFit = "cover";
+
+    webcamDiv.appendChild(img);
+};
 
     // Sembunyikan kamera, tapi jangan hapus canvas!
 webcam.stop();
@@ -567,5 +589,6 @@ document.getElementById("aboutBtn").addEventListener("click", () => {
 
 window.addEventListener("DOMContentLoaded", () => {
   init();
-}); 
+});
+
 
