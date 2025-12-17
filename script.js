@@ -325,8 +325,6 @@ window.speechSynthesis.onvoiceschanged = () => {
         voices.find(v => v.lang.toLowerCase().includes("id")) ||                           // Indo varian lain
         voices.find(v => v.lang.toLowerCase().includes("ms")) ||                           // Malay fallback (lebih medok)
         null;
-
-    console.log("Voice Indonesia terpilih:", indoVoice);
 };
 
 // Status suara
@@ -570,5 +568,6 @@ document.getElementById("aboutBtn").addEventListener("click", () => {
   };
   closeInfoBtn.addEventListener("click", newCloseHandler);
 });
+
 
 
