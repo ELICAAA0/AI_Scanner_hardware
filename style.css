@@ -85,6 +85,7 @@ body.dark-mode h1 {
   width: 290px;
   height: 290px;
   border-radius: 50%;
+   overflow: hidden; /* 🔥 WAJIB supaya foto ikut bundar */
 
   background: radial-gradient(circle, #ffffff, #eafcff);
   padding: 15px;
