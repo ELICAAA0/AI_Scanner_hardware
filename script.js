@@ -269,23 +269,7 @@ img.onload = () => {
     img.style.objectFit = "cover";
 
     webcamDiv.appendChild(img);
-};
-
-    // Sembunyikan kamera, tapi jangan hapus canvas!
-webcam.stop();
-webcam.canvas.style.display = "none";
-
-// Tempel snapshot di bawahnya
-const webcamDiv = document.getElementById("webcam");
-
-// Hapus foto sebelumnya jika ada
-const oldImg = document.getElementById("snapshotImage");
-if (oldImg) oldImg.remove();
-
-// Tambahkan foto baru
-img.id = "snapshotImage";
-webcamDiv.appendChild(img);
-
+}
 
     const infoBox = document.getElementById("infoBox");
     document.getElementById("popupTitle").innerText = name;
@@ -586,9 +570,4 @@ document.getElementById("aboutBtn").addEventListener("click", () => {
   };
   closeInfoBtn.addEventListener("click", newCloseHandler);
 });
-
-window.addEventListener("DOMContentLoaded", () => {
-  init();
-});
-
 
