@@ -354,7 +354,7 @@ function speak(text) {
 // =============================
 // 🔘 TOMBOL ON / OFF SUARA
 // =============================
-
+const soundBtn = document.getElementById("soundBtn");
 soundBtn.addEventListener("click", () => {
     soundEnabled = !soundEnabled;
 
@@ -570,4 +570,5 @@ document.getElementById("aboutBtn").addEventListener("click", () => {
   };
   closeInfoBtn.addEventListener("click", newCloseHandler);
 });
+
 
