@@ -169,85 +169,79 @@ Casing tersedia dalam berbagai ukuran seperti Mini Tower, Mid Tower, dan Full To
 }
 
 // 🚀 Inisialisasi model
-let webcamVideo; // gantikan webcam.tmImage.Webcam
+let model, webcamVideo, labelContainer, maxPredictions;
+let scanning = false;
 
+// Inisialisasi model & kamera
 async function init() {
-  const modelURL = URL + "model.json";
-  const metadataURL = URL + "metadata.json";
-  model = await tmImage.load(modelURL, metadataURL);
-  maxPredictions = model.getTotalClasses();
+    const modelURL = "./model/model.json";
+    const metadataURL = "./model/metadata.json";
 
-  // Inisialisasi kamera fallback
-  webcamVideo = document.createElement("video");
-  webcamVideo.width = 250;
-  webcamVideo.height = 250;
-  webcamVideo.autoplay = true;
-  webcamVideo.playsInline = true;
+    model = await tmImage.load(modelURL, metadataURL);
+    maxPredictions = model.getTotalClasses();
 
-  const webcamDiv = document.getElementById("webcam");
-  webcamDiv.innerHTML = "";
-  webcamDiv.appendChild(webcamVideo);
+    // Setup video
+    webcamVideo = document.createElement("video");
+    webcamVideo.width = 250;
+    webcamVideo.height = 250;
+    webcamVideo.autoplay = true;
+    webcamVideo.playsInline = true;
 
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment" },
-      audio: false
-    });
-    webcamVideo.srcObject = stream;
-  } catch (err) {
-    console.error("Tidak bisa akses kamera:", err);
-    webcamDiv.innerHTML = "⚠ Kamera tidak tersedia";
-    return;
-  }
+    const webcamDiv = document.getElementById("webcam");
+    webcamDiv.innerHTML = "";
+    webcamDiv.appendChild(webcamVideo);
 
-  // Siapkan label container
-  labelContainer = document.getElementById("label-container");
-  labelContainer.innerHTML = "";
-  for (let i = 0; i < maxPredictions; i++)
-    labelContainer.appendChild(document.createElement("div"));
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        webcamVideo.srcObject = stream;
+    } catch (err) {
+        console.error("Kamera tidak bisa diakses:", err);
+        webcamDiv.innerHTML = "⚠ Kamera tidak tersedia";
+        return;
+    }
 
-  window.scanning = true;
-  requestAnimationFrame(loop);
+    // Setup label container
+    labelContainer = document.getElementById("label-container");
+    labelContainer.innerHTML = "";
+    for (let i = 0; i < maxPredictions; i++)
+        labelContainer.appendChild(document.createElement("div"));
+
+    scanning = true;
+    requestAnimationFrame(loop);
 }
 
-// 🔁 Loop kamera
+// Loop prediksi
 async function loop() {
-  if (!window.scanning) return;
-  await predict();
-  requestAnimationFrame(loop);
+    if (!scanning) return;
+    await predict();
+    requestAnimationFrame(loop);
 }
 
-// fungsi predict
+// Prediksi frame video
 async function predict() {
     if (!model || !webcamVideo) return;
 
-    // buat canvas sementara
-    const tempCanvas = document.createElement("canvas");
-    const ctx = tempCanvas.getContext("2d");
-    const size = 250; // harus sama dengan input model
-    tempCanvas.width = size;
-    tempCanvas.height = size;
-
-    // gambar frame video ke canvas
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const size = 250;
+    canvas.width = size;
+    canvas.height = size;
     ctx.drawImage(webcamVideo, 0, 0, size, size);
 
-    // prediksi pakai canvas
-    const prediction = await model.predict(tempCanvas);
+    const predictions = await model.predict(canvas);
+    const best = predictions.reduce((a, b) => a.probability > b.probability ? a : b);
 
-    const bestPrediction = prediction.reduce((a, b) =>
-        a.probability > b.probability ? a : b
-    );
+    labelContainer.innerHTML = `<div style="font-size:20px; margin-top:10px;">
+        ${best.className}: ${(best.probability*100).toFixed(1)}%
+    </div>`;
 
-    labelContainer.innerHTML = `<div style="font-size:20px; margin-top:10px;">${bestPrediction.className}: ${(bestPrediction.probability * 100).toFixed(1)}%</div>`;
-
-    if (bestPrediction.probability > 0.98) {
-        const name = bestPrediction.className.trim();
+    if (best.probability > 0.98) {
+        const name = best.className.trim();
         const info = getHardwareInfo(name);
         if (!info) return;
 
-        const status = document.getElementById("status");
-        status.innerHTML = `✅ ${name} terdeteksi!`;
-        status.style.color = "lime";
+        document.getElementById("status").innerText = `✅ ${name} terdeteksi!`;
+        document.getElementById("status").style.color = "lime";
 
         if (window.lastSpoken !== name) {
             speak(info.sound);
@@ -259,9 +253,17 @@ async function predict() {
         document.getElementById("popupText").innerText = info.text;
         infoBox.style.display = "block";
 
-        window.scanning = false;
+        scanning = false;
     }
 }
+
+// Tombol start
+document.getElementById("startBtn").addEventListener("click", () => {
+    document.getElementById("infoBox").style.display = "none";
+    window.lastSpoken = null;
+    scanning = true;
+    init();
+});}
 
     // 🟢 Pastikan frame benar-benar tergambar
 await new Promise(resolve => requestAnimationFrame(resolve));
@@ -589,6 +591,7 @@ document.getElementById("aboutBtn").addEventListener("click", () => {
   };
   closeInfoBtn.addEventListener("click", newCloseHandler);
 });
+
 
 
 
