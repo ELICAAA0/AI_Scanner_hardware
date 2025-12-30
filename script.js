@@ -219,42 +219,48 @@ async function loop() {
 
 // fungsi predict
 async function predict() {
-  if (!model || !webcamVideo) return;
+    if (!model || !webcamVideo) return;
 
-  let source = webcamVideo;
+    // buat canvas sementara
+    const tempCanvas = document.createElement("canvas");
+    const ctx = tempCanvas.getContext("2d");
+    const size = 250; // harus sama dengan input model
+    tempCanvas.width = size;
+    tempCanvas.height = size;
 
-  if (window.uploadedImageForAI) {
-    source = window.uploadedImageForAI;
-  }
+    // gambar frame video ke canvas
+    ctx.drawImage(webcamVideo, 0, 0, size, size);
 
-  const prediction = await model.predict(source);
-  const bestPrediction = prediction.reduce((a, b) =>
-    a.probability > b.probability ? a : b
-  );
+    // prediksi pakai canvas
+    const prediction = await model.predict(tempCanvas);
 
-  labelContainer.innerHTML = `<div style="font-size:20px; margin-top:10px;">${bestPrediction.className}: ${(bestPrediction.probability * 100).toFixed(1)}%</div>`;
+    const bestPrediction = prediction.reduce((a, b) =>
+        a.probability > b.probability ? a : b
+    );
 
-  if (bestPrediction.probability > 0.98) {
-    const name = bestPrediction.className.trim();
-    const info = getHardwareInfo(name);
-    if (!info) return;
+    labelContainer.innerHTML = `<div style="font-size:20px; margin-top:10px;">${bestPrediction.className}: ${(bestPrediction.probability * 100).toFixed(1)}%</div>`;
 
-    const status = document.getElementById("status");
-    status.innerHTML = `✅ ${name} terdeteksi!`;
-    status.style.color = "lime";
+    if (bestPrediction.probability > 0.98) {
+        const name = bestPrediction.className.trim();
+        const info = getHardwareInfo(name);
+        if (!info) return;
 
-    if (window.lastSpoken !== name) {
-      speak(info.sound);
-      window.lastSpoken = name;
+        const status = document.getElementById("status");
+        status.innerHTML = `✅ ${name} terdeteksi!`;
+        status.style.color = "lime";
+
+        if (window.lastSpoken !== name) {
+            speak(info.sound);
+            window.lastSpoken = name;
+        }
+
+        const infoBox = document.getElementById("infoBox");
+        document.getElementById("popupTitle").innerText = name;
+        document.getElementById("popupText").innerText = info.text;
+        infoBox.style.display = "block";
+
+        window.scanning = false;
     }
-
-    const infoBox = document.getElementById("infoBox");
-    document.getElementById("popupTitle").innerText = name;
-    document.getElementById("popupText").innerText = info.text;
-    infoBox.style.display = "block";
-
-    window.scanning = false;
-  }
 }
 
     // 🟢 Pastikan frame benar-benar tergambar
@@ -583,6 +589,7 @@ document.getElementById("aboutBtn").addEventListener("click", () => {
   };
   closeInfoBtn.addEventListener("click", newCloseHandler);
 });
+
 
 
 
