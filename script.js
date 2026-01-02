@@ -5,6 +5,8 @@ let model, webcam, labelContainer, maxPredictions;
 window.lastSpoken = null;
 window.speaking = false;
 window.scanning = false;
+window.lastDetectedComponent = null;
+window.lastDetectedSound = null;
 
 
 // 🧩 Info utama (pendek)
@@ -172,8 +174,10 @@ Casing tersedia dalam berbagai ukuran seperti Mini Tower, Mid Tower, dan Full To
 async function init() {
   const modelURL = URL + "model.json";
   const metadataURL = URL + "metadata.json";
+
+  // load model
   model = await tmImage.load(modelURL, metadataURL);
-  maxPredictions = model.getTotalClasses();
+  maxPredictions = model.getTotalClasses(); // <- PENTING, tambahkan kurung
 
   const flip = true;
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -236,7 +240,12 @@ const prediction = await model.predict(source);
     status.innerHTML = `✅ ${name} terdeteksi!`;
     status.style.color = "lime";
 
-    if (window.lastSpoken !== name) {
+    // simpan hasil deteksi terakhir
+window.lastDetectedComponent = name;
+window.lastDetectedSound = info.sound;
+
+// bicara hanya jika suara aktif
+if (soundEnabled && window.lastSpoken !== name) {
     speak(info.sound);
     window.lastSpoken = name;
 }
@@ -352,24 +361,21 @@ function speak(text) {
 // =============================
 // 🔘 TOMBOL ON / OFF SUARA
 // =============================
-const soundBtn = document.getElementById("soundBtn");
 soundBtn.addEventListener("click", () => {
     soundEnabled = !soundEnabled;
 
     if (soundEnabled) {
         soundBtn.innerText = "🔇 Matikan Suara";
 
-        // reset supaya mau bicara lagi
-        window.lastSpoken = null;
-        window.speaking = false;
-        window.speechSynthesis.cancel();
+        // 🔁 LANGSUNG ULANGI SUARA TERAKHIR
+        if (window.lastDetectedSound) {
+            speak(window.lastDetectedSound);
+            window.lastSpoken = window.lastDetectedComponent;
+        }
 
     } else {
         soundBtn.innerText = "🔊 Aktifkan Suara";
-
-        // langsung hentikan suara
         window.speechSynthesis.cancel();
-        window.speaking = false;
     }
 });
 
